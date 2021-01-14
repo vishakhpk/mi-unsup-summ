@@ -7,11 +7,11 @@
 3. Use the created matrices to generate extractive summaries
 4. Evaluation
 
-### Fine tune the required language model
+### 1. Fine tune the required language model
 
 We use GPT2-large as provided by [HF transformers](https://github.com/huggingface/transformers) with a standard fine tuning script as provided in the model directory.
 
-### Creating mutual information matrices 
+### 2. Creating mutual information matrices 
 
 For each document in the dataset, if there are n sentences, we need to create the nxn pairwise matrix as described in the paper. <br/>
 
@@ -45,15 +45,16 @@ print(data[doc_number]['vanilla'])
 ```
 Within the pickle file, the primary index is the index of the document within the dataset pickle file. We create the 'vanilla' matrix which is an nxn sentence-wise PMI matrix as described in the paper. Additionally we also create the unused 'surprise' list which is the sentence-wise surprisal for each sentence and the 'normalised' PMI matrix.
 
-### Generate Summaries
+### 3. Generate Summaries
 From the generated pmi matrices, we generate summaries using the algorithm detailed in the paper. 
 ```
 python get_interpolated_output.py --output_file ../../Summarization/output/interpolated_
 ```
 Implicitly consumes the original dataset pickled file and the generated output files from the previous step. The script iterates over all the different output files created, and generates extractive summaries from length 1 to length 9 in 9 separate files using the format specified here. So here interpolated\_1 will consist of a text file where each line corresponds to a summary of length 1 sentence for each sentence in the dataset. And there will be 9 files like this. Additionally we also save all the gold summaries in a similar file. The reason for this file format is that it is compatible with the Rouge package in the next step. Additionally change the interpolation coefficients here if needed. 
 
-### Evaluation 
+### 4. Evaluation 
 Standard rouge evaluation using [rouge scorer](https://github.com/google-research/google-research/tree/master/rouge)
 ```
 python3 -m rouge_score.rouge --target_filepattern=../../Summarization/output/gold --prediction_filepattern=../../Summarization/output/interpolated_3 --output_filename=../../Summarization/results.csv --use_stemmer=true
 ```
+
