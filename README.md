@@ -16,7 +16,7 @@ We use GPT2-large as provided by [HF transformers](https://github.com/huggingfac
 For each document in the dataset, if there are n sentences, we need to create the nxn pairwise matrix as described in the paper. <br/>
 
 ```
-python get_matrices.py --index 0 --input_data ../../Summarization/dataset.pkl --index_file ../../Summarization/indices.pkl --output_format ../../Summarization/output/sent_train_set_
+python get_matrices.py --index 0 --input_data ./path/to/dataset.pkl --index_file ./path/to/indices.pkl --output_format ./path/to/output/sent_train_set_
 ```
 
 The parameters indicate the following:
@@ -33,13 +33,13 @@ for i in range(len(data)):
 #### Output Format
 For the given execution line, the output would look like:
 ```
-../../Summarization/output/sent_train_set_0.pkl
+./path/to/output/sent_train_set_0.pkl
 ```
-Where the location/directory was given by the output format and the 0 is given by the index executed by the current script (in practise you would have 0, 1, 2... all running in parallel)<br/>
+Where the location/directory was given by the output format parameter in step 1 and the 0 is given by the index executed by the current script (in practise you would have 0, 1, 2... all running in parallel)<br/>
 
 The pickle file is indexed as 
 ```
-data = pickle.load(open("../../Summarization/output/sent_train_set_0.pkl", "rb"))
+data = pickle.load(open("./path/to/output/sent_train_set_0.pkl", "rb"))
 doc_number = 0
 print(data[doc_number]['vanilla'])
 ```
@@ -48,13 +48,13 @@ Within the pickle file, the primary index is the index of the document within th
 ### 3. Generate Summaries
 From the generated pmi matrices, we generate summaries using the algorithm detailed in the paper. 
 ```
-python get_interpolated_output.py --output_file ../../Summarization/output/interpolated_
+python get_interpolated_output.py --output_file ./path/to/output/interpolated_
 ```
 Implicitly consumes the original dataset pickled file and the generated output files from the previous step. The script iterates over all the different output files created, and generates extractive summaries from length 1 to length 9 in 9 separate files using the format specified here. So here interpolated\_1 will consist of a text file where each line corresponds to a summary of length 1 sentence for each sentence in the dataset. And there will be 9 files like this. Additionally we also save all the gold summaries in a similar file. The reason for this file format is that it is compatible with the Rouge package in the next step. Additionally change the interpolation coefficients here if needed. 
 
 ### 4. Evaluation 
 Standard rouge evaluation using [rouge scorer](https://github.com/google-research/google-research/tree/master/rouge)
 ```
-python3 -m rouge_score.rouge --target_filepattern=../../Summarization/output/gold --prediction_filepattern=../../Summarization/output/interpolated_3 --output_filename=../../Summarization/results.csv --use_stemmer=true
+python3 -m rouge_score.rouge --target_filepattern=./path/to/output/gold --prediction_filepattern=./path/to/output/interpolated_3 --output_filename=./path/to/output/results.csv --use_stemmer=true
 ```
 

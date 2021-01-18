@@ -1,5 +1,5 @@
-export TRAIN_FILE=../../Summarization/finetune-lm-train
-export TEST_FILE=../../Summarization/finetune-lm-eval
+export TRAIN_FILE=./path/to/finetune-lm-train
+export TEST_FILE=./path/to/finetune-lm-eval
 
 python run_language_modeling.py \
     --output_dir=output_large \

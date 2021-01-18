@@ -1,6 +1,6 @@
 # Model Directory
 
-We use GPT2-large as provided by [HF transformers](https://github.com/huggingface/transformers)..
+We use GPT2-large as provided by [HF transformers](https://github.com/huggingface/transformers). This directory contains code used to interface with GPT-2 and obtain word probabilities in a sequence. 
 
 ## Fine tuning GPT2
 

@@ -6,6 +6,7 @@ from transformers import GPT2Tokenizer, GPT2LMHeadModel
 class GPT2:
     """
     Citation: https://github.com/HendrikStrobelt/detecting-fake-text/blob/master/backend/api.py
+    Model class for GPT-2. Primarily used to obtain word probabilities
     """
     def __init__(self, device = "cpu", location = ""):
         if location == "":
@@ -43,11 +44,6 @@ class GPT2:
         
         Returns:
             Dictionary "payload" containing:
-            pred_topk: 
-                - List of lists, one for each token in sequence
-                - Each list is of tuples of the form (predicted_word, probability)
-                - Sorted in descending order by probability 
-            
             real_probs
                 - List of tuples, one for each token in sequence
                 - Probability of the actual words in the sequence

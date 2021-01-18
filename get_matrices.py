@@ -34,9 +34,12 @@ print(lower, upper)
 
 nlp = spacy.load("en_core_web_sm")
 
-model = GPT2(device="cuda", location="../../Summarization/models/")
+model = GPT2(device="cuda", location="./path/to/saved/model/")
 
 def get_probabilities(articles):
+    """
+    Given a batch of articles (can be any strings) run a forward pass on GPT2 and obtain word probabilities for the same
+    """
     article_splits = [article.split(" ") for article in articles]
     payload = model.get_probabilities(articles, topk = 20)
     res = [[] for i in range(len(articles))]
@@ -53,9 +56,6 @@ def get_probabilities(articles):
         found_words = []
         for i, word in enumerate(payload["context_strings"][t][:-1]):
             context = context+" "+word
-            #print("\n--------------------\n", word, word[0]=="Â")
-            #predictions = payload["pred_topk"][t][i]
-            #position = payload['real_probs'][t][i][0] #Position of correct guess within predictions
             probability = payload['real_probs'][t][i]#[1]
             next_word_fragment = payload["context_strings"][t][i+1]
 
@@ -80,44 +80,16 @@ def get_probabilities(articles):
     return res
 
 
-def get_pmi_matrix(sentences, method = 1, batch_size = 20):
-    temp = np.zeros((len(sentences), len(sentences)))
-    batch_indices = {}
-    batch = []
-    batchCount = 0
-    batchSize = batch_size
-    #print(len(sentences))
-    for i in range(len(sentences)):
-        for j in range(len(sentences)):
-            #print(i, j)
-            if i==j: 
-                temp[i][j] = -1
-                continue
-            article = sentences[i] + " "+ sentences[j]
-            #print(article)
-            batch_indices[str(i)+"-"+str(j)+"-"+str(len(sentences[i].split()))] = [batchCount, batchCount+1] 
-            batch.append(article)
-            batch.append(sentences[j])
-            batchCount+=2
-            
-            if batchCount == batchSize or (i == len(sentences)-1 and j == len(sentences)-1):
-                #print(batch)
-                result = get_probabilities(batch)
-                for key in batch_indices.keys():
-                    #print(key)
-                    #print(key.split("-"))
-                    i, j, l = [int(idx) for idx in key.split("-")]
-                    try:
-                        temp[i][j] = (sum([math.log(i) for i in result[batch_indices[key][0]][l:]]) - sum([math.log(i) for i in result[batch_indices[key][1]]]))/(-1*sum([math.log(i) for i in result[batch_indices[key][0]][l:]]))
-                    except ZeroDivisionError:
-                        temp[i][j] = -1
-                    #temp[i][j] = sum([math.log(i) for i in result[batch_indices[key][0]][l:]]) - sum([math.log(i) for i in result[batch_indices[key][1]]])
-                batchCount = 0
-                batch = []
-                batch_indices = {}
-    return temp
-
 def get_npmi_matrix(sentences, method = 1, batch_size = 1):
+    """
+    Accepts a list of sentences of length n and returns 3 objects:
+    - Normalised PMI nxn matrix - temp
+    - PMI nxn matrix - temp2
+    - List of length n indicating sentence-wise surprisal i.e. p(sentence) - p 
+
+    To optimize performance, we do the forward pass batchwise by assembling the batch and maintaining batch indices
+    For each batch we call get_probabilities
+    """
     temp = np.zeros((len(sentences), len(sentences)))
     temp2 = np.zeros((len(sentences), len(sentences)))
     batch_indices = {}
@@ -136,17 +108,14 @@ def get_npmi_matrix(sentences, method = 1, batch_size = 1):
             return temp, temp2, p
     for i in range(len(sentences)):
         for j in range(len(sentences)):
-            #print(i, j)
-            if i==j:# len(sentences[i].split()) == 0 or len(sentences[j].split()) == 0 or 
+            if i==j: 
                 temp[i][j] = -1
                 temp2[i][j] = -1
                 continue
             article = sentences[i] + " "+ sentences[j]
             #print(article)
-            batch_indices[str(i)+"-"+str(j)+"-"+str(len(sentences[i].split()))] = batchCount#[batchCount, batchCount+1, batchCount+2] 
+            batch_indices[str(i)+"-"+str(j)+"-"+str(len(sentences[i].split()))] = batchCount 
             batch.append(article)
-            #batch.append(sentences[j])
-            #batch.append(sentences[i])
             batchCount+=1
             
             if batchCount == batchSize or (i == len(sentences)-1 and j == len(sentences)-1):
@@ -178,35 +147,6 @@ def get_npmi_matrix(sentences, method = 1, batch_size = 1):
     return temp, temp2, p
 
 
-def get_sentence_groundtruths(article, sample_groundtruths):
-    article_sents = tokenize.sent_tokenize(article)
-    start = 0
-    end = 0
-    res_groundtruths = []
-    for sent in article_sents:
-        end+=len(sent.split())
-        if sum(sample_groundtruths[start:end]) > 0:
-            res_groundtruths.append(1)
-        else:
-            res_groundtruths.append(0)
-        start = end
-    return res_groundtruths
-
-def get_topk(temp, k=5):
-    max_idxs = [np.argsort(i) for i in temp]
-    sums = []
-    for i in range(len(temp)):
-        s=0
-        for idx in max_idxs[i]:
-            s+=temp[i][idx]
-        sums.append(s)
-    #[print(i, sums[i]) for i in np.argsort(sums)[-k:]]
-    sents = [0 for i in range(len(temp))]
-    for i in np.argsort(sums)[-k:]:
-        sents[i]=1
-    return [sentences[i] for i in sorted(np.argsort(sums)[-k:])], sents
-
-
 if os.path.exists(args.output_format+args.index+".pkl"):
     output = pickle.load(open(args.output_format+args.index+".pkl","rb"))
 else:
@@ -216,6 +156,9 @@ def remove_unicode(text):
     return ''.join([i if ord(i) < 128 else ' ' for i in text])
 
 def get_article(idx):
+    """
+    For each document in the dataset, split it into sentences and call get_npmi_matrix to create the matrices
+    """
     print(idx)
     article, abstract = data[idx]
     #sentences = tokenize.sent_tokenize(article)
@@ -232,6 +175,9 @@ def get_article(idx):
     return
 
 c = 0
+"""
+Main iteration loop, creates matrices for each document in the dataset
+"""
 for idx in range(len(data)):
     if idx>=lower and idx<upper and idx not in output.keys():
         get_article(idx) 
