@@ -58,3 +58,7 @@ Standard rouge evaluation using [rouge scorer](https://github.com/google-researc
 python3 -m rouge_score.rouge --target_filepattern=./path/to/output/gold --prediction_filepattern=./path/to/output/interpolated_3 --output_filename=./path/to/output/results.csv --use_stemmer=true
 ```
 
+## Data for the paper
+The following contains the preprocessed datasets, created PMI matrices, generated summaries and Rouge score reports used in our paper: <br>
+
+[Google Drive Link](https://drive.google.com/drive/folders/1dBPd7trOOdKTNFDtUSGH9Z3zZ2PucDmL?usp=sharing)
