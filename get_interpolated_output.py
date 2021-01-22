@@ -9,16 +9,18 @@ import argparse
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument("--classifier")
 parser.add_argument("--output_file")
+parser.add_argument("--dataset_file")
+parser.add_argument("--matrix_file_pattern")
 
 args = parser.parse_args()
 
 clf = pickle.load(open(args.classifier, "rb"))
 
-data = pickle.load(open("../../Summarization/dataset.pkl", "rb"))
+data = pickle.load(open(args.dataset_file, "rb"))
 
 for file_idx in range(5):
     count = 0
-    output = pickle.load(open("../../Summarization/output/sent_train_set_"+str(file_idx)+".pkl", "rb"))
+    output = pickle.load(open(args.matrix_file_pattern+str(file_idx)+".pkl", "rb"))
     for key in output.keys():
         #if key not in ref.keys():
         #    continue
@@ -69,7 +71,7 @@ for file_idx in range(5):
                 with open(args.output_file+str(j), "a") as f:
                     f.write(summary+'\n')
 
-            with open("../../Summarization/output/gold", "a") as f:
+            with open("./path/to/output/gold", "a") as f:
                 f.write(' '.join(abstract.split())+'\n')
         except:
             print("Missed ", key)

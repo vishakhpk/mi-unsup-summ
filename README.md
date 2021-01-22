@@ -48,9 +48,9 @@ Within the pickle file, the primary index is the index of the document within th
 ### 3. Generate Summaries
 From the generated pmi matrices, we generate summaries using the algorithm detailed in the paper. 
 ```
-python get_interpolated_output.py --output_file ./path/to/output/interpolated_
+python get_interpolated_output.py --output_file ./path/to/output/interpolated_ --dataset_file ./path/to/dataset.pkl --matrix_file_pattern ./path/to/output/sent_train_set_ 
 ```
-Implicitly consumes the original dataset pickled file and the generated output files from the previous step. The script iterates over all the different output files created, and generates extractive summaries from length 1 to length 9 in 9 separate files using the format specified here. So here interpolated\_1 will consist of a text file where each line corresponds to a summary of length 1 sentence for each sentence in the dataset. And there will be 9 files like this. Additionally we also save all the gold summaries in a similar file. The reason for this file format is that it is compatible with the Rouge package in the next step. Additionally change the interpolation coefficients here if needed. 
+Consumes the original dataset pickled file and the generated output files from the previous step. The script iterates over all the different output files created (hence why we aceept it as a pattern), and generates extractive summaries from length 1 to length 9 in 9 separate files using the format specified here. So here interpolated\_1 will consist of a text file where each line corresponds to a summary of length 1 sentence for each sentence in the dataset. And there will be 9 files like this. Additionally we also save all the gold summaries in a similar file. The reason for this file format is that it is compatible with the Rouge package in the next step. Additionally change the interpolation coefficients here if needed. 
 
 ### 4. Evaluation 
 Standard rouge evaluation using [rouge scorer](https://github.com/google-research/google-research/tree/master/rouge)
