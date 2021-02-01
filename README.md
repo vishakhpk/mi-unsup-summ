@@ -61,4 +61,6 @@ python3 -m rouge_score.rouge --target_filepattern=./path/to/output/gold --predic
 ## Data for the paper
 The following contains the preprocessed datasets, created PMI matrices, generated summaries and Rouge score reports used in our paper: <br>
 
-[Google Drive Link](https://drive.google.com/drive/folders/1dBPd7trOOdKTNFDtUSGH9Z3zZ2PucDmL?usp=sharing)
+[Google Drive Link](https://drive.google.com/drive/folders/1dBPd7trOOdKTNFDtUSGH9Z3zZ2PucDmL?usp=sharing) <br>
+
+Please reach out if you would like to use the exact saved language models. We use GPT2 large, fine tuned on the document sentences from the various domains, using the script in the models directory. The input files for the fine tuning script are available in folder [LM-Files](https://drive.google.com/drive/folders/1XrlzvJqmvcK0IpYK-VwIN5tk2y6iIILi?usp=sharing) at the above drive location.
