@@ -36,6 +36,11 @@ nlp = spacy.load("en_core_web_sm")
 
 model = GPT2(device="cuda", location="./path/to/saved/model/")
 
+if os.path.exists(args.output_format+args.index+".pkl"):
+    output = pickle.load(open(args.output_format+args.index+".pkl","rb"))
+else:
+    output = {}
+
 def get_probabilities(articles):
     """
     Given a batch of articles (can be any strings) run a forward pass on GPT2 and obtain word probabilities for the same
@@ -146,12 +151,6 @@ def get_npmi_matrix(sentences, method = 1, batch_size = 1):
                 batch_indices = {}
     return temp, temp2, p
 
-
-if os.path.exists(args.output_format+args.index+".pkl"):
-    output = pickle.load(open(args.output_format+args.index+".pkl","rb"))
-else:
-    output = {}
-
 def remove_unicode(text):
     return ''.join([i if ord(i) < 128 else ' ' for i in text])
 
@@ -174,10 +173,10 @@ def get_article(idx):
     #pickle.dump(output, open("full_set_1.pkl", "wb"))
     return
 
-c = 0
 """
 Main iteration loop, creates matrices for each document in the dataset
 """
+c = 0
 for idx in range(len(data)):
     if idx>=lower and idx<upper and idx not in output.keys():
         get_article(idx) 
