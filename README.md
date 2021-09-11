@@ -63,7 +63,7 @@ The following contains the preprocessed datasets, created PMI matrices, generate
 
 [Google Drive Link](https://drive.google.com/drive/folders/1dBPd7trOOdKTNFDtUSGH9Z3zZ2PucDmL?usp=sharing) <br>
 
-Please reach out if you would like to use the exact saved language models. We use GPT2 large, fine tuned on the document sentences from the various domains, using the script in the models directory. The input files for the fine tuning script are available in folder [LM-Files](https://drive.google.com/drive/folders/1XrlzvJqmvcK0IpYK-VwIN5tk2y6iIILi?usp=sharing) at the above drive location.
+Please reach out if you would like to use our saved language models (vishakh@nyu.edu). We use GPT2 large, fine tuned on the document sentences from the various domains, using the script in the models directory. The input files for the fine tuning script are available in folder [LM-Files](https://drive.google.com/drive/folders/1XrlzvJqmvcK0IpYK-VwIN5tk2y6iIILi?usp=sharing) at the above drive location.
 
 ## TODOs
 1. Convert scripts to a reusable utility
